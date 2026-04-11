@@ -22,12 +22,10 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 var app = builder.Build();
 
-// 👉 Chỉ bật Swagger khi dev (chuẩn hơn)
-if (app.Environment.IsDevelopment())
-{
+
     app.UseSwagger();
     app.UseSwaggerUI();
-}
+
 
 app.UseAuthorization();
 
