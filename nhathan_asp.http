@@ -1,0 +1,6 @@
+@nhathan_asp_HostAddress = http://localhost:5281
+
+GET {{nhathan_asp_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
