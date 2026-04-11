@@ -1,10 +1,10 @@
 ﻿using nhathan_asp.Data;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
+using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// 👉 Controller + fix JSON loop
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
     {
@@ -12,25 +12,32 @@ builder.Services.AddControllers()
         options.JsonSerializerOptions.WriteIndented = true;
     });
 
-// 👉 Swagger
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(options =>
+{
+    options.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Title = "nhathan",
+        Version = "v1",
+        Description = "API Quan Ly Sinh Vien - Real Estate Project"
+    });
+});
 
-// 👉 Kết nối DB
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 var app = builder.Build();
 
-// 👉 Chỉ bật Swagger khi dev (chuẩn hơn)
-if (app.Environment.IsDevelopment())
+app.UseSwagger();
+app.UseSwaggerUI(c =>
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "nhathan v1");
+    c.RoutePrefix = "swagger";
+});
 
 app.UseAuthorization();
-
 app.MapControllers();
 
-app.Run();
+// Cấu hình cổng chạy cho Render
+var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
+app.Run($"http://0.0.0.0:{port}");
